@@ -1,6 +1,5 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { TextField, Button, Box } from '@mui/material';
 import { Todo } from '../types/todo';
 
 interface TodoFormProps {
@@ -24,22 +23,29 @@ export const TodoForm = ({ onSubmit }: TodoFormProps) => {
   });
 
   return (
-    <Box component="form" onSubmit={formik.handleSubmit} className="mb-8">
+    <form onSubmit={formik.handleSubmit} className="mb-8">
       <div className="flex gap-4">
-        <TextField
-          fullWidth
-          id="title"
-          name="title"
-          label="Todo Title"
-          value={formik.values.title}
-          onChange={formik.handleChange}
-          error={formik.touched.title && Boolean(formik.errors.title)}
-          helperText={formik.touched.title && formik.errors.title}
-        />
-        <Button type="submit" variant="contained" color="primary">
+        <div className="flex-grow">
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="Enter todo title"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {formik.touched.title && formik.errors.title && (
+            <p className="mt-1 text-sm text-red-600">{formik.errors.title}</p>
+          )}
+        </div>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
           Add Todo
-        </Button>
+        </button>
       </div>
-    </Box>
+    </form>
   );
 };

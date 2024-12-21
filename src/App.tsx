@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Typography, Tab, Tabs, Box } from '@mui/material';
 import { TodoForm } from './components/TodoForm';
 import { TodoItem } from './components/TodoItem';
 import { addTodo, updateTodo, deleteTodo } from './store/slices/todoSlice';
@@ -43,21 +42,30 @@ function App() {
   );
 
   return (
-    <Container maxWidth="md" className="py-8">
-      <Typography variant="h4" component="h1" className="mb-8">
-        Todo Application
-      </Typography>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">
+        Todo 
+      </h1>
 
       <TodoForm onSubmit={handleAddTodo} />
 
-      <Tabs value={status} onChange={(_, newValue) => setStatus(newValue)} className="mb-4">
-        <Tab label="All" value="all" />
-        <Tab label="Todo" value="Todo" />
-        <Tab label="Doing" value="Doing" />
-        <Tab label="Done" value="Done" />
-      </Tabs>
+      <div className="flex gap-2 mb-6">
+        {(['all', 'Todo', 'Doing', 'Done'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setStatus(tab)}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              status === tab
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {tab === 'all' ? 'All' : tab}
+          </button>
+        ))}
+      </div>
 
-      <Box>
+      <div className="space-y-4">
         {filteredTodos.map((todo) => (
           <TodoItem
             key={todo.id}
@@ -67,8 +75,8 @@ function App() {
             onUpdate={handleUpdateTodo}
           />
         ))}
-      </Box>
-    </Container>
+      </div>
+    </div>
   );
 }
 
