@@ -7,8 +7,8 @@ export default {
       colors: {
         // main colors / colores principales
         primary: {
-          light: '#4F46E5', // improved contrast / contraste mejorado
-          dark: '#3730A3',  // darker shade / tono más oscuro
+          light: '#4F46E5', 
+          dark: '#3730A3',  
         },
         // background colors / colores de fondo
         background: {
@@ -20,7 +20,7 @@ export default {
           light: '#FFFFFF',
           dark: '#1E293B',
         },
-        // subtle background colors
+    
         subtle: {
           light: '#F8FAFC',
           dark: '#1E293B',
