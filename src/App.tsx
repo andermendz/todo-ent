@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from './store/store';
-import { fetchTodos, createTodo, updateTodoStatus, removeTodo } from './store/slices/todoSlice';
+import { useEffect, useState } from 'react';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { TodoForm } from './components/TodoForm';
 import { TodoItem } from './components/TodoItem';
 import { useTheme } from './hooks/useTheme';
+import { AppDispatch, RootState } from './store/store';
+import { fetchTodos, createTodo, updateTodoStatus, removeTodo, updateTodo } from './store/slices/todoSlice';
 import { Todo } from './types/todo';
 
 function App() {
@@ -12,8 +13,8 @@ function App() {
   const { items: todos, loading, error } = useSelector((state: RootState) => state.todos);
   const [status, setStatus] = useState<'all' | Todo['status']>('all');
   const { theme, toggleTheme } = useTheme();
+  const [activeOptionsId, setActiveOptionsId] = useState<string | null>(null);
 
-  // fetch todos on component mount
   useEffect(() => {
     dispatch(fetchTodos());
   }, [dispatch]);
@@ -36,70 +37,136 @@ function App() {
     await dispatch(removeTodo(id));
   };
 
+  const handleUpdateTodo = async (todo: Todo) => {
+    await dispatch(updateTodo(todo));
+  };
+
   const filteredTodos = todos.filter((todo) => 
     status === 'all' ? true : todo.status === status
   );
 
   const statusOptions = ['all', 'Todo', 'Doing', 'Done'] as const;
 
+  const handleKeyPress = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return (
+      <div 
+        className="text-center py-8" 
+        role="status" 
+        aria-live="polite"
+      >
+        Loading tasks...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-8 text-red-600">{error}</div>;
+    return (
+      <div 
+        className="text-center py-8 text-red-600" 
+        role="alert"
+        aria-live="assertive"
+      >
+        {error}
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
-            Todo App
-          </h1>
-          <button
-            onClick={toggleTheme}
-            className="p-3 rounded-full bg-gray-200 dark:bg-gray-700 transition-all duration-300 hover:scale-110"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? '🌞' : '🌙'}
-          </button>
-        </div>
-
-        <TodoForm onSubmit={handleAddTodo} />
-
-        <div className="flex gap-2 mb-4">
-          {statusOptions.map((option) => (
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 
+                  bg-primary-light text-white px-4 py-2 rounded-lg z-50
+                  focus:outline-none focus:ring-2 focus:ring-primary-light"
+      >
+        Skip to main content
+      </a>
+      
+      <div className="min-h-screen transition-colors duration-300 bg-background-light dark:bg-background-dark">
+        <main id="main-content" className="max-w-3xl mx-auto px-4 py-12">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">
+              Tasks
+            </h1>
+            
             <button
-              key={option}
-              onClick={() => setStatus(option)}
-              className={`px-4 py-2 rounded-lg ${
-                status === option
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'
-              }`}
+              onClick={toggleTheme}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 
+                       hover:bg-slate-200 dark:hover:bg-slate-700
+                       transition-colors duration-200
+                       focus:outline-none focus:ring-2 focus:ring-primary-light"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {option}
+              {theme === 'dark' ? (
+                <SunIcon className="w-6 h-6 text-amber-500" aria-hidden="true" />
+              ) : (
+                <MoonIcon className="w-6 h-6 text-slate-700" aria-hidden="true" />
+              )}
             </button>
-          ))}
-        </div>
+          </div>
+          
+          <section aria-labelledby="form-heading">
+            <h2 id="form-heading" className="sr-only">Add New Task</h2>
+            <TodoForm onSubmit={handleAddTodo} />
+          </section>
 
-        <div className="space-y-4">
-          {filteredTodos.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              onStatusChange={handleStatusChange}
-              onDelete={handleDeleteTodo}
-              onUpdate={(updatedTodo) => dispatch(updateTodoStatus({
-                id: updatedTodo.id,
-                status: updatedTodo.status
-              }))}
-            />
-          ))}
-        </div>
+          <section aria-labelledby="filter-heading" className="mt-8">
+            <h2 id="filter-heading" className="sr-only">Filter Tasks</h2>
+            <div className="flex gap-2 mb-6" role="radiogroup" aria-label="Filter tasks by status">
+              {statusOptions.map((option) => (
+                <button
+                  key={option}
+                  onClick={() => setStatus(option)}
+                  onKeyDown={(e) => handleKeyPress(e, () => setStatus(option))}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
+                            focus:outline-none focus:ring-2 focus:ring-primary-light
+                            ${status === option
+                              ? 'bg-primary-light text-white'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}
+                  role="radio"
+                  aria-checked={status === option}
+                  tabIndex={0}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section aria-labelledby="todo-list-heading">
+            <h2 id="todo-list-heading" className="sr-only">Task List</h2>
+            {filteredTodos.length === 0 ? (
+              <p className="text-center text-slate-600 dark:text-slate-400" role="status">
+                No tasks found
+              </p>
+            ) : (
+              <ul className="space-y-3" role="list">
+                {filteredTodos.map((todo) => (
+                  <li key={todo.id}>
+                    <TodoItem
+                      todo={todo}
+                      onStatusChange={handleStatusChange}
+                      onDelete={handleDeleteTodo}
+                      onUpdate={handleUpdateTodo}
+                      activeOptionsId={activeOptionsId}
+                      onOptionsClick={setActiveOptionsId}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </main>
       </div>
-    </div>
+    </>
   );
 }
 

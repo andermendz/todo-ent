@@ -48,6 +48,17 @@ export const removeTodo = createAsyncThunk(
   }
 );
 
+export const updateTodo = createAsyncThunk(
+  'todos/updateTodo',
+  async (todo: Todo, { rejectWithValue }) => {
+    try {
+      return await todoApi.updateTodo(todo.id, todo);
+    } catch (error) {
+      return rejectWithValue('Failed to update todo');
+    }
+  }
+);
+
 const todoSlice = createSlice({
   name: 'todos',
   initialState: {
@@ -71,20 +82,28 @@ const todoSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // create
+      // fetch todos from api / obtener todos desde api
+
       .addCase(createTodo.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
-      //update
+      // create new todo / crear nuevo todo
       .addCase(updateTodoStatus.fulfilled, (state, action) => {
         const index = state.items.findIndex(todo => todo.id === action.payload.id);
         if (index !== -1) {
           state.items[index] = action.payload;
         }
       })
-      //delete
+     // delete todo / eliminar todo
       .addCase(removeTodo.fulfilled, (state, action) => {
         state.items = state.items.filter(todo => todo.id !== action.payload);
+      })
+      // update todo status / actualizar estado del todo
+      .addCase(updateTodo.fulfilled, (state, action) => {
+        const index = state.items.findIndex(todo => todo.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
       });
   },
 });

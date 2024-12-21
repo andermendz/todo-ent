@@ -1,163 +1,308 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { TrashIcon, CheckCircleIcon, ClockIcon, ListBulletIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Todo } from "../types/todo";
 import { ApprovalModal } from "./ApprovalModal";
 
+// props for the todo item component / props para el componente de item todo
 interface TodoItemProps {
   todo: Todo;
   onStatusChange: (id: string, status: Todo["status"]) => void;
   onDelete: (id: string) => void;
   onUpdate: (todo: Todo) => void;
+  activeOptionsId: string | null;
+  onOptionsClick: (id: string | null) => void;
 }
 
-export const TodoItem = ({
-  todo,
-  onStatusChange,
-  onDelete,
+export const TodoItem = ({ 
+  todo, 
+  onStatusChange, 
+  onDelete, 
   onUpdate,
+  activeOptionsId,
+  onOptionsClick 
 }: TodoItemProps) => {
-  const [showApproval, setShowApproval] = useState(false);
+  // modal and edit states / estados de modal y edición
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<Todo["status"] | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(todo.title);
+  const [editedTitle, setEditedTitle] = useState(todo.title);
 
+  // status options with their icons and colors / opciones de estado con sus iconos y colores
+  const statusOptions = [
+    { value: 'Todo', icon: ListBulletIcon, color: 'text-blue-500' },
+    { value: 'Doing', icon: ClockIcon, color: 'text-amber-500' },
+    { value: 'Done', icon: CheckCircleIcon, color: 'text-emerald-500' },
+  ] as const;
+
+  // handle status changes / manejar cambios de estado
   const handleStatusChange = (newStatus: Todo["status"]) => {
     if (newStatus === "Done") {
-      setShowApproval(true);
+      setShowApprovalModal(true);
       setPendingStatus(newStatus);
     } else {
       onStatusChange(todo.id, newStatus);
     }
+    onOptionsClick(null);
   };
 
+  // approve status change / aprobar cambio de estado
   const handleApprove = () => {
     if (pendingStatus) {
       onStatusChange(todo.id, pendingStatus);
+      setShowApprovalModal(false);
+      setPendingStatus(null);
     }
-    setShowApproval(false);
-    setPendingStatus(null);
   };
 
-  const handleSave = () => {
-    if (editTitle.trim()) {
+  // delete todo / eliminar todo
+  const handleDelete = () => {
+    setShowDeleteModal(false);
+    onDelete(todo.id);
+  };
+
+  // get current status info / obtener información del estado actual
+  const currentStatus = statusOptions.find(status => status.value === todo.status);
+  const CurrentIcon = currentStatus?.icon;
+  const isOptionsOpen = activeOptionsId === todo.id;
+
+  // edit mode handlers / manejadores del modo de edición
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setEditedTitle(todo.title);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditing(false);
+    setEditedTitle(todo.title);
+  };
+
+  // title validation / validación del título
+  const isValidTitle = (title: string) => {
+    const trimmedTitle = title.trim();
+    return trimmedTitle.length >= 3 && trimmedTitle.length <= 50;
+  };
+
+  // submit edit / enviar edición
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isValidTitle(editedTitle) && editedTitle !== todo.title) {
       onUpdate({
         ...todo,
-        title: editTitle,
-        updatedAt: new Date(),
+        title: editedTitle.trim(),
+        updatedAt: new Date()
       });
-      setIsEditing(false);
     }
-  };
-
-  const handleCancel = () => {
-    setEditTitle(todo.title);
     setIsEditing(false);
   };
 
-  const getStatusColor = (status: Todo["status"]) => {
-    const colors = {
-      Todo: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100",
-      Doing: "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100",
-      Done: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100"
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setIsExpanded(false);
+      }
     };
-    return colors[status];
-  };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // unique ids for accessibility / ids únicos para accesibilidad
+  const statusButtonId = `status-button-${todo.id}`;
+  const statusMenuId = `status-menu-${todo.id}`;
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex-grow">
-            {isEditing ? (
-              <input
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-dark transition-colors duration-300"
-                autoFocus
-                aria-label="Edit todo title"
-              />
-            ) : (
-              <>
-                <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white transition-colors duration-300">
-                  {todo.title}
-                </h3>
-                <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                  <p>Created: {new Date(todo.createdAt).toLocaleString()}</p>
-                  {todo.createdAt.toString() !== todo.updatedAt.toString() && (
-                    <p>Updated: {new Date(todo.updatedAt).toLocaleString()}</p>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <select
-              value={todo.status}
-              onChange={(e) => handleStatusChange(e.target.value as Todo["status"])}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium ${getStatusColor(
-                todo.status
-              )} border-0 cursor-pointer focus:outline-none focus:ring-ring-primary-dark transition-all duration-300`}
-              aria-label="Change todo status"
-            >
-              <option value="Todo">Todo</option>
-              <option value="Doing">Doing</option>
-              <option value="Done">Done</option>
-            </select>
-
-            <div className="flex gap-2">
+      <div className="group bg-white dark:bg-surface-dark rounded-xl p-5 mb-4
+                    shadow-premium dark:shadow-premium-dark
+                    hover:shadow-lg transition-all duration-300
+                    animate-slide-in w-full"
+                    role="listitem">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-4 w-full">
+            <div className="flex-grow min-w-0">
               {isEditing ? (
-                <>
-                  <button
-                    onClick={handleSave}
-                    className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-full transition-colors duration-300"
-                    aria-label="Save changes"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors duration-300"
-                    aria-label="Cancel editing"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </>
+                <form onSubmit={handleEditSubmit} className="flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="text"
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value.slice(0, 50))}
+                      className="flex-grow px-3 py-1.5 rounded-lg text-lg
+                             bg-slate-50 dark:bg-slate-800
+                             border border-slate-200 dark:border-slate-700
+                             focus:outline-none focus:ring-2 focus:ring-primary-light/20
+                             text-slate-800 dark:text-slate-200"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      disabled={!isValidTitle(editedTitle)}
+                      className={`p-1.5 rounded-lg text-emerald-500
+                             bg-emerald-50 dark:bg-emerald-500/10
+                             transition-all duration-200
+                             ${!isValidTitle(editedTitle)
+                               ? 'opacity-50 cursor-not-allowed'
+                               : 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
+                             }`}
+                    >
+                      <CheckCircleIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleEditCancel}
+                      className="p-1.5 rounded-lg text-slate-500
+                             bg-slate-50 dark:bg-slate-800
+                             hover:bg-slate-100 dark:hover:bg-slate-700"
+                    >
+                      <XMarkIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 px-1">
+                    <span>
+                      {editedTitle.trim().length < 3 
+                        ? 'Title must be at least 3 characters' 
+                        : editedTitle.length > 50 
+                          ? 'Title is too long' 
+                          : ' '}
+                    </span>
+                    <span>{editedTitle.length}/50</span>
+                  </div>
+                </form>
               ) : (
                 <>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors duration-300"
-                    aria-label="Edit todo"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => onDelete(todo.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors duration-300"
-                    aria-label="Delete todo"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </button>
+                  <div className="flex flex-col">
+                    <h3 className="text-lg text-slate-800 dark:text-slate-200 font-medium 
+                                leading-tight break-words">
+                      {todo.title}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <time 
+                        dateTime={todo.createdAt.toString()}
+                        className="text-sm text-slate-500 dark:text-slate-400"
+                      >
+                        {new Date(todo.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </time>
+                      {todo.updatedAt > todo.createdAt && (
+                        <span className="text-sm text-slate-400 dark:text-slate-500">
+                          (edited)
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </>
               )}
+            </div>
+
+            <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+              <div className="relative">
+                <button
+                  id={statusButtonId}
+                  onClick={() => onOptionsClick(isOptionsOpen ? null : todo.id)}
+                  aria-expanded={isOptionsOpen}
+                  aria-haspopup="true"
+                  aria-controls={statusMenuId}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm
+                            transition-all duration-200 relative
+                            border border-slate-200 dark:border-slate-700
+                            hover:border-slate-300 dark:hover:border-slate-600
+                            ${currentStatus?.color}
+                            hover:bg-slate-50 dark:hover:bg-slate-800
+                            font-medium`}
+                >
+                  {CurrentIcon && (
+                    <CurrentIcon className="w-4 h-4" aria-hidden="true" />
+                  )}
+                  <span>{todo.status}</span>
+                </button>
+
+                {isOptionsOpen && (
+                  <div 
+                    id={statusMenuId}
+                    role="menu"
+                    aria-labelledby={statusButtonId}
+                    className="absolute right-0 mt-2 bg-white dark:bg-surface-dark rounded-xl
+                                shadow-premium dark:shadow-premium-dark p-1.5
+                                transform origin-top-right transition-all duration-200
+                                animate-scale z-10
+                                border border-slate-200 dark:border-slate-700
+                                min-w-[120px] max-h-[calc(100vh-100px)]
+                                overflow-y-auto
+                                [&::-webkit-scrollbar]:hidden">
+                    <div className="relative">
+                      {statusOptions.map((option) => {
+                        const Icon = option.icon;
+                        return (
+                          <button
+                            key={option.value}
+                            onClick={() => handleStatusChange(option.value)}
+                            role="menuitem"
+                            className={`flex items-center gap-2 w-full px-3.5 py-2.5
+                                      rounded-lg text-sm font-medium
+                                      transition-all duration-200
+                                      ${option.color}
+                                      hover:bg-slate-50 dark:hover:bg-slate-800
+                                      whitespace-nowrap`}
+                          >
+                            <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                            {option.value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleEditClick}
+                className="p-1.5 rounded-lg text-blue-500
+                         bg-blue-50 dark:bg-blue-500/10
+                         hover:bg-blue-100 dark:hover:bg-blue-500/20
+                         hover:text-blue-600 dark:hover:text-blue-400
+                         transition-all duration-300
+                         flex-shrink-0"
+                aria-label={`Edit task: ${todo.title}`}
+              >
+                <PencilIcon className="w-5 h-5" aria-hidden="true" />
+              </button>
+
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="p-1.5 rounded-lg text-rose-500
+                         bg-rose-50 dark:bg-rose-500/10
+                         hover:bg-rose-100 dark:hover:bg-rose-500/20
+                         hover:text-rose-600 dark:hover:text-rose-400
+                         transition-all duration-200
+                         flex-shrink-0"
+                aria-label={`Delete task: ${todo.title}`}
+              >
+                <TrashIcon className="w-5 h-5" aria-hidden="true" />
+              </button>
             </div>
           </div>
         </div>
       </div>
+
       <ApprovalModal
-        open={showApproval}
-        onClose={() => setShowApproval(false)}
+        open={showApprovalModal}
+        onClose={() => setShowApprovalModal(false)}
         onApprove={handleApprove}
         title={todo.title}
+      />
+
+      <ApprovalModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onApprove={handleDelete}
+        title={todo.title}
+        message="Are you sure you want to delete this task?"
+        confirmText="Delete"
+        confirmStyle="danger"
       />
     </>
   );
