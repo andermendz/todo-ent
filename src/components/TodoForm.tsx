@@ -39,7 +39,7 @@ export const TodoForm = ({ onSubmit }: TodoFormProps) => {
               placeholder="Add a new task..."
               maxLength={50}
               className="w-full px-4 py-2.5 rounded-xl text-lg
-                       bg-white dark:bg-surface-dark
+                       bg-subtle-light dark:bg-surface-dark
                        border border-slate-200 dark:border-slate-700
                        focus:outline-none focus:ring-2 focus:ring-primary-light
                        text-slate-800 dark:text-slate-200

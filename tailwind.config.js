@@ -12,12 +12,17 @@ export default {
         },
         // background colors / colores de fondo
         background: {
-          light: '#F8FAFC',
+          light: '#F1F5F9',
           dark: '#0F172A',
         },
         // surface colors / colores de superficie
         surface: {
           light: '#FFFFFF',
+          dark: '#1E293B',
+        },
+        // subtle background colors
+        subtle: {
+          light: '#F8FAFC',
           dark: '#1E293B',
         },
         // text colors / colores de texto

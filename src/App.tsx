@@ -90,7 +90,7 @@ function App() {
       </a>
       
       <div className="min-h-screen transition-colors duration-300 bg-background-light dark:bg-background-dark">
-        <main id="main-content" className="max-w-3xl mx-auto px-4 py-12">
+      <main id="main-content" className="max-w-3xl mx-auto px-4 py-12 pb-28">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">
               Tasks

@@ -113,8 +113,9 @@ export const TodoItem = ({
 
   return (
     <>
-      <div className="group bg-white dark:bg-surface-dark rounded-xl p-5 mb-4
+      <div className="group bg-subtle-light dark:bg-surface-dark rounded-xl p-5 mb-4
                     shadow-premium dark:shadow-premium-dark
+                    hover:bg-white dark:hover:bg-slate-800
                     hover:shadow-lg transition-all duration-300
                     animate-slide-in w-full"
                     role="listitem">
@@ -129,7 +130,7 @@ export const TodoItem = ({
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value.slice(0, 50))}
                       className="flex-grow px-3 py-1.5 rounded-lg text-lg
-                             bg-slate-50 dark:bg-slate-800
+                             bg-subtle-light dark:bg-slate-800
                              border border-slate-200 dark:border-slate-700
                              focus:outline-none focus:ring-2 focus:ring-primary-light/20
                              text-slate-800 dark:text-slate-200"

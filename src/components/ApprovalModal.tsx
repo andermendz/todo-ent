@@ -65,13 +65,14 @@ export const ApprovalModal = ({
         ref={modalRef}
         className="bg-white dark:bg-surface-dark rounded-2xl p-6
                   max-w-md w-full mx-4 shadow-premium dark:shadow-premium-dark
-                  animate-scale"
+                  animate-scale overflow-hidden"
         role="document"
       >
         {/* modal title / título del modal */}
         <h2 
           id="modal-title" 
-          className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4"
+          className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4
+                     break-words line-clamp-2"
         >
           {title}
         </h2>
@@ -79,7 +80,8 @@ export const ApprovalModal = ({
         {/* modal message / mensaje del modal */}
         <p 
           id="modal-description" 
-          className="text-slate-600 dark:text-slate-400 mb-6"
+          className="text-slate-600 dark:text-slate-400 mb-6
+                     break-words line-clamp-3"
         >
           {message}
         </p>
@@ -94,7 +96,8 @@ export const ApprovalModal = ({
                      dark:border-slate-700 hover:bg-slate-50
                      dark:hover:bg-slate-800 transition-all duration-200
                      text-slate-600 dark:text-slate-300
-                     focus:outline-none focus:ring-2 focus:ring-primary-light"
+                     focus:outline-none focus:ring-2 focus:ring-primary-light
+                     whitespace-nowrap"
           >
             Cancel
           </button>
@@ -105,6 +108,7 @@ export const ApprovalModal = ({
             className={`px-4 py-2 rounded-xl text-white
                      transition-all duration-200 transform hover:scale-105
                      focus:outline-none focus:ring-2 focus:ring-primary-light
+                     whitespace-nowrap
                      ${confirmStyle === 'danger' 
                        ? 'bg-rose-500 hover:bg-rose-600' 
                        : 'bg-primary-light hover:bg-primary-dark'}`}
