@@ -11,7 +11,6 @@ function App() {
   const dispatch = useDispatch();
   const todos = useSelector((state: RootState) => state.todos.items);
   const [status, setStatus] = useState<'all' | Todo['status']>('all');
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const handleAddTodo = (values: Partial<Todo>) => {
     const newTodo: Todo = {
@@ -24,18 +23,10 @@ function App() {
     dispatch(addTodo(newTodo));
   };
 
-  const handleUpdateTodo = (values: Partial<Todo>) => {
-    if (editingTodo) {
-      const updatedTodo: Todo = {
-        ...editingTodo,
-        title: values.title!,
-        updatedAt: new Date()
-      };
-      dispatch(updateTodo(updatedTodo));
-      setEditingTodo(null);
-    }
+  const handleUpdateTodo = (todo: Todo) => {
+    dispatch(updateTodo(todo));
   };
-  
+
   const handleDeleteTodo = (id: string) => {
     dispatch(deleteTodo(id));
   };
@@ -54,14 +45,10 @@ function App() {
   return (
     <Container maxWidth="md" className="py-8">
       <Typography variant="h4" component="h1" className="mb-8">
-        Todo
+        Todo Application
       </Typography>
 
-      <TodoForm
-        onSubmit={editingTodo ? handleUpdateTodo : handleAddTodo}
-        initialValues={editingTodo || undefined}
-        isEditing={!!editingTodo}
-      />
+      <TodoForm onSubmit={handleAddTodo} />
 
       <Tabs value={status} onChange={(_, newValue) => setStatus(newValue)} className="mb-4">
         <Tab label="All" value="all" />
@@ -77,7 +64,7 @@ function App() {
             todo={todo}
             onStatusChange={handleStatusChange}
             onDelete={handleDeleteTodo}
-            onEdit={setEditingTodo}
+            onUpdate={handleUpdateTodo}
           />
         ))}
       </Box>

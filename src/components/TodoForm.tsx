@@ -5,18 +5,16 @@ import { Todo } from '../types/todo';
 
 interface TodoFormProps {
   onSubmit: (values: Partial<Todo>) => void;
-  initialValues?: Partial<Todo>;
-  isEditing?: boolean;
 }
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required').min(3, 'Title must be at least 3 characters'),
 });
 
-export const TodoForm = ({ onSubmit, initialValues, isEditing = false }: TodoFormProps) => {
+export const TodoForm = ({ onSubmit }: TodoFormProps) => {
   const formik = useFormik({
     initialValues: {
-      title: initialValues?.title || '',
+      title: '',
     },
     validationSchema,
     onSubmit: (values) => {
@@ -39,7 +37,7 @@ export const TodoForm = ({ onSubmit, initialValues, isEditing = false }: TodoFor
           helperText={formik.touched.title && formik.errors.title}
         />
         <Button type="submit" variant="contained" color="primary">
-          {isEditing ? 'Update' : 'Add'} Todo
+          Add Todo
         </Button>
       </div>
     </Box>
