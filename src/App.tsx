@@ -13,7 +13,7 @@ function App() {
   const [status, setStatus] = useState<'all' | Todo['status']>('all');
   const { theme, toggleTheme } = useTheme();
 
-  // Fetch todos on component mount
+  // fetch todos on component mount
   useEffect(() => {
     dispatch(fetchTodos());
   }, [dispatch]);
