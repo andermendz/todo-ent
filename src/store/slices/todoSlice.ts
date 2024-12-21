@@ -1,68 +1,92 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Todo } from '../../types/todo';
+import { todoApi } from '../../services/api';
 
-// states
-interface TodoState {
-  items: Todo[];
-  loading: boolean;
-  error: string | null;
-}
+// async thunks
+export const fetchTodos = createAsyncThunk(
+  'todos/fetchTodos',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await todoApi.getAllTodos();
+    } catch (error) {
+      return rejectWithValue('Failed to fetch todos');
+    }
+  }
+);
 
-// initial states
-const initialState: TodoState = {
-  items: [],
-  loading: false,
-  error: null,
-};
+export const createTodo = createAsyncThunk(
+  'todos/createTodo',
+  async (todo: Omit<Todo, 'id'>, { rejectWithValue }) => {
+    try {
+      return await todoApi.createTodo(todo);
+    } catch (error) {
+      return rejectWithValue('Failed to create todo');
+    }
+  }
+);
 
-//action handlers
+export const updateTodoStatus = createAsyncThunk(
+  'todos/updateTodoStatus',
+  async ({ id, status }: { id: string; status: Todo['status'] }, { rejectWithValue }) => {
+    try {
+      return await todoApi.updateTodo(id, { status });
+    } catch (error) {
+      return rejectWithValue('Failed to update todo status');
+    }
+  }
+);
+
+export const removeTodo = createAsyncThunk(
+  'todos/removeTodo',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await todoApi.deleteTodo(id);
+      return id;
+    } catch (error) {
+      return rejectWithValue('Failed to delete todo');
+    }
+  }
+);
+
 const todoSlice = createSlice({
   name: 'todos',
-  initialState,
-  reducers: {
-    // add new todo
-    addTodo: (state, action: PayloadAction<Todo>) => {
-      state.items.push(action.payload);
-    },
-    
-    // update an existing one
-    updateTodo: (state, action: PayloadAction<Todo>) => {
-      const todoIndex = state.items.findIndex(
-        todo => todo.id === action.payload.id
-      );
-      
-      if (todoIndex !== -1) {
-        state.items[todoIndex] = {
-          ...state.items[todoIndex],
-          ...action.payload,
-          updatedAt: new Date()
-        };
-      }
-    },
-    
-    // remove tood by id
-    deleteTodo: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter(todo => todo.id !== action.payload);
-    },
-
-    //set loading
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
-    },
-
-    //set error
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
-    }
+  initialState: {
+    items: [] as Todo[],
+    loading: false,
+    error: null as string | null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      // fetch todos
+      .addCase(fetchTodos.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTodos.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchTodos.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // create
+      .addCase(createTodo.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+      })
+      //update
+      .addCase(updateTodoStatus.fulfilled, (state, action) => {
+        const index = state.items.findIndex(todo => todo.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      //delete
+      .addCase(removeTodo.fulfilled, (state, action) => {
+        state.items = state.items.filter(todo => todo.id !== action.payload);
+      });
   },
 });
-
-export const { 
-  addTodo, 
-  updateTodo, 
-  deleteTodo,
-  setLoading,
-  setError 
-} = todoSlice.actions;
 
 export default todoSlice.reducer;

@@ -1,42 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from './store/store';
+import { fetchTodos, createTodo, updateTodoStatus, removeTodo } from './store/slices/todoSlice';
 import { TodoForm } from './components/TodoForm';
 import { TodoItem } from './components/TodoItem';
-import { addTodo, updateTodo, deleteTodo } from './store/slices/todoSlice';
 import { useTheme } from './hooks/useTheme';
-import type { RootState } from './store/store';
-import type { Todo } from './types/todo';
+import { Todo } from './types/todo';
 
 function App() {
-  const dispatch = useDispatch();
-  const todos = useSelector((state: RootState) => state.todos.items);
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: todos, loading, error } = useSelector((state: RootState) => state.todos);
   const [status, setStatus] = useState<'all' | Todo['status']>('all');
   const { theme, toggleTheme } = useTheme();
 
-  const handleAddTodo = (values: Partial<Todo>) => {
-    const newTodo: Todo = {
-      id: Date.now().toString(),
+  // Fetch todos on component mount
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, [dispatch]);
+
+  const handleAddTodo = async (values: Partial<Todo>) => {
+    const newTodo = {
       title: values.title!,
-      status: 'Todo',
+      status: 'Todo' as const,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    dispatch(addTodo(newTodo));
+    await dispatch(createTodo(newTodo));
   };
 
-  const handleUpdateTodo = (todo: Todo) => {
-    dispatch(updateTodo(todo));
+  const handleStatusChange = async (id: string, newStatus: Todo['status']) => {
+    await dispatch(updateTodoStatus({ id, status: newStatus }));
   };
 
-  const handleDeleteTodo = (id: string) => {
-    dispatch(deleteTodo(id));
-  };
-
-  const handleStatusChange = (id: string, newStatus: Todo['status']) => {
-    const todo = todos.find((t) => t.id === id);
-    if (todo) {
-      dispatch(updateTodo({ ...todo, status: newStatus }));
-    }
+  const handleDeleteTodo = async (id: string) => {
+    await dispatch(removeTodo(id));
   };
 
   const filteredTodos = todos.filter((todo) => 
@@ -45,11 +42,19 @@ function App() {
 
   const statusOptions = ['all', 'Todo', 'Doing', 'Done'] as const;
 
+  if (loading) {
+    return <div className="text-center py-8">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-8 text-red-600">{error}</div>;
+  }
+
   return (
     <div className="min-h-screen transition-colors duration-300 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white transition-colors duration-300">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white">
             Todo App
           </h1>
           <button
@@ -60,47 +65,38 @@ function App() {
             {theme === 'dark' ? '🌞' : '🌙'}
           </button>
         </div>
-        
-        <div className="animate-fade-in">
-          <TodoForm onSubmit={handleAddTodo} />
-        </div>
 
-        <div className="flex flex-wrap gap-2 mb-6 animate-fade-in">
-          {statusOptions.map((tab) => (
+        <TodoForm onSubmit={handleAddTodo} />
+
+        <div className="flex gap-2 mb-4">
+          {statusOptions.map((option) => (
             <button
-              key={tab}
-              onClick={() => setStatus(tab)}
-              className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-                status === tab
-                  ? 'bg-primary-dark dark:bg-primary-light text-white transform scale-105'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+              key={option}
+              onClick={() => setStatus(option)}
+              className={`px-4 py-2 rounded-lg ${
+                status === option
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'
               }`}
             >
-              {tab === 'all' ? 'All' : tab}
+              {option}
             </button>
           ))}
         </div>
 
         <div className="space-y-4">
-          {filteredTodos.map((todo, index) => (
-            <div
+          {filteredTodos.map((todo) => (
+            <TodoItem
               key={todo.id}
-              className="animate-slide-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <TodoItem
-                todo={todo}
-                onStatusChange={handleStatusChange}
-                onDelete={handleDeleteTodo}
-                onUpdate={handleUpdateTodo}
-              />
-            </div>
+              todo={todo}
+              onStatusChange={handleStatusChange}
+              onDelete={handleDeleteTodo}
+              onUpdate={(updatedTodo) => dispatch(updateTodoStatus({
+                id: updatedTodo.id,
+                status: updatedTodo.status
+              }))}
+            />
           ))}
-          {filteredTodos.length === 0 && (
-            <p className="text-center text-gray-500 dark:text-gray-400 py-8 animate-fade-in">
-              No todos found.
-            </p>
-          )}
         </div>
       </div>
     </div>
