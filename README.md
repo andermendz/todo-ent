@@ -32,6 +32,20 @@ A modern task management application built with React, TypeScript, and Redux Too
 - Keyboard navigation for non-mouse users.
 - Screen reader support for visually impaired users.
 
+### 🧪 Testing Coverage
+- Component unit tests.
+- Integration tests for workflows.
+- API interaction tests.
+- Accessibility testing.
+- Mock service worker (MSW) for API simulation.
+
+### 🏭 Task Factory
+- Generate sample tasks dynamically.
+- Randomized task combinations.
+- Realistic task descriptions.
+- Automatic status distribution.
+- Quick data population for testing and demos.
+
 ## 🛠 Tech Stack
 
 ### **Frontend**
@@ -46,10 +60,17 @@ A modern task management application built with React, TypeScript, and Redux Too
 - Formik for forms.
 - Yup for validation.
 
-### **Development**
+### **Testing**
+- Vitest for unit and integration testing.
+- React Testing Library for component testing.
+- MSW for API mocking.
+- Jest DOM for DOM testing utilities.
+
+### **Development Tools**
 - Vite for fast builds and development.
 - ESLint for code quality.
 - JSON Server (Mock API) for development backend.
+- Task Factory for generating sample data.
 
 ## 🚀 Getting Started
 
@@ -144,4 +165,3 @@ The following endpoints are available in both local and production environments:
 1. Ensure Railway deployment is active.
 2. Verify that Vercel's environment variables are correctly set.
 3. Confirm CORS settings in the server configuration.
-
