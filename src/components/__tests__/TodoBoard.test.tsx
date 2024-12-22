@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { TodoBoard } from '../TodoBoard';
 import { vi } from 'vitest';
 
-// Mock the dnd library
 vi.mock('@hello-pangea/dnd', () => ({
   DragDropContext: ({ children }: { children: React.ReactNode }) => children,
   Droppable: ({ children }: { children: Function }) => 

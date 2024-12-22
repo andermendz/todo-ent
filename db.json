@@ -10,7 +10,7 @@
     {
       "id": "factory-1734841249969-1",
       "title": "Monitor Database to fix reported issues",
-      "status": "To Do",
+      "status": "Done",
       "createdAt": "2024-12-18T03:15:26.893Z",
       "updatedAt": "2024-12-18T03:15:26.893Z"
     },
@@ -23,17 +23,10 @@
     },
     {
       "id": "factory-1734841812864-1",
-      "title": "Monitor Performance based on user feedback",
+      "title": "Monitor Performance based on user feedbackbnjmklml",
       "status": "To Do",
       "createdAt": "2024-12-19T16:24:05.954Z",
-      "updatedAt": "2024-12-19T16:24:05.954Z"
-    },
-    {
-      "id": "factory-1734841812864-2",
-      "title": "Test User interface for compliance requirements",
-      "status": "In Progress",
-      "createdAt": "2024-12-17T14:47:20.756Z",
-      "updatedAt": "2024-12-17T14:47:20.756Z"
+      "updatedAt": "2024-12-22T21:03:58.822Z"
     },
     {
       "id": "factory-1734841812864-3",
@@ -41,13 +34,6 @@
       "status": "In Progress",
       "createdAt": "2024-12-21T00:33:01.362Z",
       "updatedAt": "2024-12-21T00:33:01.362Z"
-    },
-    {
-      "id": "factory-1734842019259-0",
-      "title": "Test Chat system with the team",
-      "status": "To Do",
-      "createdAt": "2024-12-17T21:37:34.439Z",
-      "updatedAt": "2024-12-17T21:37:34.439Z"
     },
     {
       "id": "factory-1734842019259-1",
@@ -90,6 +76,27 @@
       "status": "In Progress",
       "createdAt": "2024-12-17T10:56:23.462Z",
       "updatedAt": "2024-12-17T10:56:23.462Z"
+    },
+    {
+      "id": "factory-1734901450105-0",
+      "title": "Deploy Reports generator to improve user experience",
+      "status": "To Do",
+      "createdAt": "2024-12-15T21:56:17.575Z",
+      "updatedAt": "2024-12-15T21:56:17.575Z"
+    },
+    {
+      "id": "factory-1734901450105-1",
+      "title": "Update File upload in production environment",
+      "status": "Done",
+      "createdAt": "2024-12-20T04:48:32.515Z",
+      "updatedAt": "2024-12-20T04:48:32.515Z"
+    },
+    {
+      "id": "factory-1734901450105-2",
+      "title": "Validate Authentication system following the roadmap",
+      "status": "To Do",
+      "createdAt": "2024-12-19T12:04:51.668Z",
+      "updatedAt": "2024-12-19T12:04:51.668Z"
     }
   ]
 }

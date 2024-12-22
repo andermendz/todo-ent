@@ -48,7 +48,7 @@ describe('TodoItem', () => {
     const deleteButton = screen.getByLabelText(`Delete task: ${mockTodo.title}`);
     await userEvent.click(deleteButton);
 
-    // Click the confirm button in the approval modal
+    // click the confirm button in the approval modal
     const confirmButton = screen.getByText('Delete');
     await userEvent.click(confirmButton);
     
@@ -58,16 +58,16 @@ describe('TodoItem', () => {
   it('handles update in edit mode', async () => {
     render(<TodoItem {...mockProps} />);
     
-    // Enter edit mode
+    // enter edit mode
     const editButton = screen.getByLabelText(`Edit task: ${mockTodo.title}`);
     await userEvent.click(editButton);
     
-    // Update title
+    // pdate title
     const input = screen.getByDisplayValue(mockTodo.title);
     await userEvent.clear(input);
     await userEvent.type(input, 'Updated Todo');
     
-    // Save changes
+    // save changes
     const saveButton = screen.getByLabelText('Save changes');
     await userEvent.click(saveButton);
     
@@ -81,11 +81,11 @@ describe('TodoItem', () => {
   it('cancels edit mode without changes', async () => {
     render(<TodoItem {...mockProps} />);
     
-    // Enter edit mode
+    // enter edit mode
     const editButton = screen.getByLabelText(`Edit task: ${mockTodo.title}`);
     await userEvent.click(editButton);
     
-    // Cancel editing
+    // cancel editing
     const cancelButton = screen.getByLabelText('Cancel editing');
     await userEvent.click(cancelButton);
     
