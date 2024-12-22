@@ -11,6 +11,7 @@ interface TodoItemProps {
   onUpdate: (todo: Todo) => void;
   activeOptionsId: string | null;
   onOptionsClick: (id: string | null) => void;
+  isBoardMode?: boolean;
 }
 
 export const TodoItem = ({ 
@@ -19,7 +20,8 @@ export const TodoItem = ({
   onDelete, 
   onUpdate,
   activeOptionsId,
-  onOptionsClick 
+  onOptionsClick,
+  isBoardMode
 }: TodoItemProps) => {
   // modal and edit states / estados de modal y edición
   const [showApprovalModal, setShowApprovalModal] = useState(false);
@@ -113,12 +115,16 @@ export const TodoItem = ({
 
   return (
     <>
-      <div className="group bg-subtle-light dark:bg-surface-dark rounded-xl p-5 mb-4
+      <div 
+        className={`group bg-subtle-light dark:bg-surface-dark rounded-xl 
+                    ${isBoardMode ? 'p-3' : 'p-5'} mb-4
                     shadow-premium dark:shadow-premium-dark
                     hover:bg-white dark:hover:bg-slate-800
                     hover:shadow-lg transition-all duration-300
-                    animate-slide-in w-full"
-                    role="listitem">
+                    animate-slide-in w-full`}
+        role="listitem"
+        aria-label={`Task: ${todo.title}`}
+      >
         <div className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4 w-full">
             <div className="flex-grow min-w-0">
