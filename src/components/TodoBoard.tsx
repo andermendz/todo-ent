@@ -22,16 +22,14 @@ export const TodoBoard = ({
   onOptionsClick
 }: TodoBoardProps) => {
   const columns = [
-    { id: 'To Do', title: 'To Do', icon: ListBulletIcon },
-    { id: 'In Progress', title: 'In Progress', icon: ClockIcon },
-    { id: 'Done', title: 'Done', icon: CheckCircleIcon }
+    { id: 'To Do', title: 'To Do', icon: ListBulletIcon, color: 'bg-blue-50 dark:bg-blue-500/5' },
+    { id: 'In Progress', title: 'In Progress', icon: ClockIcon, color: 'bg-amber-50/70 dark:bg-amber-500/10' },
+    { id: 'Done', title: 'Done', icon: CheckCircleIcon, color: 'bg-emerald-50 dark:bg-emerald-500/5' }
   ];
 
   const handleDragEnd = useCallback((result: DropResult) => {
     const { destination, draggableId } = result;
-
     if (!destination) return;
-
     const newStatus = destination.droppableId as Todo['status'];
     onStatusChange(draggableId, newStatus);
   }, [onStatusChange]);
@@ -46,24 +44,33 @@ export const TodoBoard = ({
         {columns.map(column => (
           <div 
             key={column.id}
-            className="bg-slate-100 dark:bg-slate-800 rounded-xl p-6 flex flex-col"
+            className={`rounded-xl p-4 flex flex-col ${column.color}`}
             role="region"
             aria-label={`${column.title} column`}
           >
-            <h3 
-              id={`column-${column.id}`}
-              className="text-xl font-semibold mb-4 text-slate-700 dark:text-slate-300"
-            >
-              {column.title}
-            </h3>
+            <div className="flex items-center gap-2 mb-4">
+              <column.icon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              <h3 
+                id={`column-${column.id}`}
+                className="text-lg font-semibold text-slate-700 dark:text-slate-300"
+              >
+                {column.title}
+              </h3>
+              <span className="ml-auto text-sm text-slate-500 dark:text-slate-400">
+                {todos.filter(todo => todo.status === column.id).length}
+              </span>
+            </div>
             
             <Droppable droppableId={column.id}>
               {(provided, snapshot) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className={`flex-1 space-y-4 p-2 rounded-md transition-bg duration-200
-                            ${snapshot.isDraggingOver ? 'bg-slate-200 dark:bg-slate-700' : 'bg-slate-100 dark:bg-slate-800'}`}
+                  className={`flex-1 space-y-3 p-2 rounded-lg transition-colors duration-200
+                            ${snapshot.isDraggingOver 
+                              ? 'bg-slate-100/80 dark:bg-slate-800/80' 
+                              : 'bg-transparent'
+                            }`}
                   role="list"
                   aria-labelledby={`column-${column.id}`}
                 >
@@ -80,8 +87,10 @@ export const TodoBoard = ({
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`transition-shadow duration-200
-                                      ${snapshot.isDragging ? 'shadow-lg opacity-75' : 'shadow-md opacity-100'}`}
+                            className={`transition-all duration-200
+                                      ${snapshot.isDragging 
+                                        ? 'rotate-2 scale-105 shadow-lg' 
+                                        : 'rotate-0 scale-100'}`}
                           >
                             <TodoItem
                               todo={todo}
