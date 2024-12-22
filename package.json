@@ -7,7 +7,7 @@
     "dev": "vite",
     "start": "node server.js",
     "server": "json-server --watch db.json --port 3001",
-    "build": "tsc -b && vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
