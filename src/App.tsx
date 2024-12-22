@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { SunIcon, MoonIcon, ViewColumnsIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import { TodoForm } from './components/TodoForm';
 import { TodoItem } from './components/TodoItem';
@@ -25,7 +25,7 @@ function App() {
     const newTodo = {
       id: Date.now().toString(),
       title: values.title!,
-      status: 'Todo' as const,
+      status: 'To Do' as const,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -44,11 +44,22 @@ function App() {
     await dispatch(updateTodo(todo));
   };
 
-  const filteredTodos = todos.filter((todo) => 
-    status === 'all' ? true : todo.status === status
-  );
+  const filteredTodos = useMemo(() => {
+    if (viewMode === 'board') {
+      return todos;
+    }
+    return status === 'all' 
+      ? todos 
+      : todos.filter(todo => todo.status === status);
+  }, [todos, status, viewMode]);
 
-  const statusOptions = ['all', 'Todo', 'Doing', 'Done'] as const;
+  useEffect(() => {
+    if (viewMode === 'board') {
+      setStatus('all');
+    }
+  }, [viewMode]);
+
+  const statusOptions = ['All', 'To Do', 'In Progress', 'Done'] as const;
 
   const handleKeyPress = (e: React.KeyboardEvent, action: () => void) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -56,6 +67,21 @@ function App() {
       action();
     }
   };
+
+  // Force list view on mobile screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768 && viewMode === 'board') {
+        setViewMode('list');
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [viewMode]);
 
   if (loading) {
     return (
@@ -100,20 +126,22 @@ function App() {
             </h1>
             
             <div className="flex items-center gap-6">
-              <button
-                onClick={() => setViewMode(viewMode === 'list' ? 'board' : 'list')}
-                className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
-                          hover:bg-slate-200 dark:hover:bg-slate-700
-                          transition-colors duration-200
-                          focus:outline-none focus:ring-2 focus:ring-primary-light"
-                aria-label={`Switch to ${viewMode === 'list' ? 'board' : 'list'} view`}
-              >
-                {viewMode === 'list' ? (
-                  <ViewColumnsIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                ) : (
-                  <ListBulletIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                )}
-              </button>
+              <div className="hidden md:block">
+                <button
+                  onClick={() => setViewMode(viewMode === 'list' ? 'board' : 'list')}
+                  className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
+                            hover:bg-slate-200 dark:hover:bg-slate-700
+                            transition-colors duration-200
+                            focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  aria-label={`Switch to ${viewMode === 'list' ? 'board' : 'list'} view`}
+                >
+                  {viewMode === 'list' ? (
+                    <ViewColumnsIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                  ) : (
+                    <ListBulletIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                  )}
+                </button>
+              </div>
               <button 
                 onClick={toggleTheme}
                 className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
@@ -136,57 +164,30 @@ function App() {
             <TodoForm onSubmit={handleAddTodo} />
           </section>
 
-        
-        
-          <section aria-labelledby="todo-list-heading" className="w-full">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex gap-3" role="radiogroup" aria-label="Filter tasks by status">
-                {statusOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setStatus(option)}
-                    onKeyDown={(e) => handleKeyPress(e, () => setStatus(option))}
-                    className={`px-5 py-3 rounded-full text-sm font-medium transition-all duration-200
-                              focus:outline-none focus:ring-2 focus:ring-primary-light
-                              ${status === option
-                                ? 'bg-primary-light text-white'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                              }`}
-                    role="radio"
-                    aria-checked={status === option}
-                    tabIndex={0}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex gap-2">
+          {viewMode === 'list' && (
+            <div className="flex gap-3 mb-6" role="radiogroup" aria-label="Filter tasks by status">
+              {statusOptions.map((option) => (
                 <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-xl transition-colors duration-200
-                           ${viewMode === 'list' 
-                             ? 'bg-primary-light text-white' 
-                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                           }`}
-                  aria-label="Switch to list view"
+                  key={option}
+                  onClick={() => setStatus(option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done')}
+                  onKeyDown={(e) => handleKeyPress(e, () => setStatus(option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done'))}
+                  className={`px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200
+                            focus:outline-none focus:ring-2 focus:ring-primary-light
+                            ${status === (option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done')
+                              ? 'bg-primary-light text-white'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}
+                  role="radio"
+                  aria-checked={status === (option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done')}
+                  tabIndex={0}
                 >
-                  <ListBulletIcon className="w-5 h-5" />
+                  {option}
                 </button>
-                <button
-                  onClick={() => setViewMode('board')}
-                  className={`p-2 rounded-xl transition-colors duration-200
-                           ${viewMode === 'board'
-                             ? 'bg-primary-light text-white'
-                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                           }`}
-                  aria-label="Switch to board view"
-                >
-                  <ViewColumnsIcon className="w-5 h-5" />
-                </button>
-              </div>
+              ))}
             </div>
+          )}
 
+          <section aria-labelledby="todo-list-heading" className="w-full">
             {filteredTodos.length === 0 ? (
               <p className="text-center text-slate-600 dark:text-slate-400">
                 No tasks found

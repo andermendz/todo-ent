@@ -2,6 +2,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { Todo } from '../types/todo';
 import { TodoItem } from './TodoItem';
 import { useCallback } from 'react';
+import { ListBulletIcon, ClockIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 interface TodoBoardProps {
   todos: Todo[];
@@ -12,12 +13,6 @@ interface TodoBoardProps {
   onOptionsClick: (id: string | null) => void;
 }
 
-const columns = [
-  { id: 'Todo', title: 'To Do' },
-  { id: 'Doing', title: 'In Progress' },
-  { id: 'Done', title: 'Done' }
-] as const;
-
 export const TodoBoard = ({
   todos,
   onStatusChange,
@@ -26,6 +21,12 @@ export const TodoBoard = ({
   activeOptionsId,
   onOptionsClick
 }: TodoBoardProps) => {
+  const columns = [
+    { id: 'To Do', title: 'To Do', icon: ListBulletIcon },
+    { id: 'In Progress', title: 'In Progress', icon: ClockIcon },
+    { id: 'Done', title: 'Done', icon: CheckCircleIcon }
+  ];
+
   const handleDragEnd = useCallback((result: DropResult) => {
     const { destination, draggableId } = result;
 

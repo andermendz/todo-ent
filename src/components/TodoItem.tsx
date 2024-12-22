@@ -32,8 +32,8 @@ export const TodoItem = ({
 
   // status options with their icons and colors / opciones de estado con sus iconos y colores
   const statusOptions = [
-    { value: 'Todo', icon: ListBulletIcon, color: 'text-blue-500' },
-    { value: 'Doing', icon: ClockIcon, color: 'text-amber-500' },
+    { value: 'To Do', icon: ListBulletIcon, color: 'text-blue-500' },
+    { value: 'In Progress', icon: ClockIcon, color: 'text-amber-500' },
     { value: 'Done', icon: CheckCircleIcon, color: 'text-emerald-500' },
   ] as const;
 
@@ -116,114 +116,102 @@ export const TodoItem = ({
   return (
     <>
       <div 
-        className={`group bg-subtle-light dark:bg-surface-dark rounded-xl 
-                    ${isBoardMode ? 'p-3' : 'p-5'} mb-4
-                    shadow-premium dark:shadow-premium-dark
-                    hover:bg-white dark:hover:bg-slate-800
-                    hover:shadow-lg transition-all duration-300
-                    animate-slide-in w-full`}
+        className={`group bg-white dark:bg-surface-dark rounded-xl shadow-md
+                   ${isBoardMode ? 'p-3' : 'p-5'} 
+                   hover:shadow-lg transition-all duration-300
+                   animate-slide-in w-full`}
         role="listitem"
         aria-label={`Task: ${todo.title}`}
       >
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start justify-between gap-4 w-full">
+        {isEditing ? (
+          <form onSubmit={handleEditSubmit} className="flex flex-col gap-2">
+            <div className="flex items-start gap-2">
+              <input
+                type="text"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value.slice(0, 50))}
+                className="flex-grow px-3 py-1.5 rounded-lg text-lg
+                       bg-subtle-light dark:bg-slate-800
+                       border border-slate-200 dark:border-slate-700
+                       focus:outline-none focus:ring-2 focus:ring-primary-light/20
+                       text-slate-800 dark:text-slate-200"
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={!isValidTitle(editedTitle)}
+                className={`p-1.5 rounded-lg text-emerald-500
+                       bg-emerald-50 dark:bg-emerald-500/10
+                       transition-all duration-200
+                       ${!isValidTitle(editedTitle)
+                         ? 'opacity-50 cursor-not-allowed'
+                         : 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
+                       }`}
+              >
+                <CheckCircleIcon className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleEditCancel}
+                className="p-1.5 rounded-lg text-slate-500
+                       bg-slate-50 dark:bg-slate-800
+                       hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 px-1">
+              <span>
+                {editedTitle.trim().length < 3 
+                  ? 'Title must be at least 3 characters' 
+                  : editedTitle.length > 50 
+                    ? 'Title is too long' 
+                    : ' '}
+              </span>
+              <span>{editedTitle.length}/50</span>
+            </div>
+          </form>
+        ) : (
+          <div className={`flex ${isBoardMode ? 'flex-col gap-3' : 'flex-row gap-4'}`}>
             <div className="flex-grow min-w-0">
-              {isEditing ? (
-                <form onSubmit={handleEditSubmit} className="flex flex-col gap-2">
-                  <div className="flex items-start gap-2">
-                    <input
-                      type="text"
-                      value={editedTitle}
-                      onChange={(e) => setEditedTitle(e.target.value.slice(0, 50))}
-                      className="flex-grow px-3 py-1.5 rounded-lg text-lg
-                             bg-subtle-light dark:bg-slate-800
-                             border border-slate-200 dark:border-slate-700
-                             focus:outline-none focus:ring-2 focus:ring-primary-light/20
-                             text-slate-800 dark:text-slate-200"
-                      autoFocus
-                    />
-                    <button
-                      type="submit"
-                      disabled={!isValidTitle(editedTitle)}
-                      className={`p-1.5 rounded-lg text-emerald-500
-                             bg-emerald-50 dark:bg-emerald-500/10
-                             transition-all duration-200
-                             ${!isValidTitle(editedTitle)
-                               ? 'opacity-50 cursor-not-allowed'
-                               : 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
-                             }`}
-                    >
-                      <CheckCircleIcon className="w-5 h-5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleEditCancel}
-                      className="p-1.5 rounded-lg text-slate-500
-                             bg-slate-50 dark:bg-slate-800
-                             hover:bg-slate-100 dark:hover:bg-slate-700"
-                    >
-                      <XMarkIcon className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 px-1">
-                    <span>
-                      {editedTitle.trim().length < 3 
-                        ? 'Title must be at least 3 characters' 
-                        : editedTitle.length > 50 
-                          ? 'Title is too long' 
-                          : ' '}
-                    </span>
-                    <span>{editedTitle.length}/50</span>
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <div className="flex flex-col">
-                    <h3 className="text-lg text-slate-800 dark:text-slate-200 font-medium 
-                                leading-tight break-words">
-                      {todo.title}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <time 
-                        dateTime={todo.createdAt.toString()}
-                        className="text-sm text-slate-500 dark:text-slate-400"
-                      >
-                        {new Date(todo.createdAt).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </time>
-                      {todo.updatedAt > todo.createdAt && (
-                        <span className="text-sm text-slate-400 dark:text-slate-500">
-                          (edited)
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+              <h3 className="text-lg text-slate-800 dark:text-slate-200 font-medium 
+                           leading-tight break-words">
+                {todo.title}
+              </h3>
+              <time 
+                dateTime={todo.createdAt.toString()}
+                className="text-sm text-slate-500 dark:text-slate-400 block mt-1"
+              >
+                {new Date(todo.createdAt).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+                {todo.updatedAt > todo.createdAt && (
+                  <span className="ml-2 text-slate-400 dark:text-slate-500">
+                    (edited)
+                  </span>
+                )}
+              </time>
             </div>
 
-            <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+            <div className={`flex ${isBoardMode ? 'justify-between' : 'items-center gap-1.5'} flex-shrink-0`}>
               <div className="relative">
                 <button
-                  id={statusButtonId}
+                  id={`status-button-${todo.id}`}
                   onClick={() => onOptionsClick(isOptionsOpen ? null : todo.id)}
                   aria-expanded={isOptionsOpen}
                   aria-haspopup="true"
-                  aria-controls={statusMenuId}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm
-                            transition-all duration-200 relative
-                            border border-slate-200 dark:border-slate-700
-                            hover:border-slate-300 dark:hover:border-slate-600
-                            ${currentStatus?.color}
-                            hover:bg-slate-50 dark:hover:bg-slate-800
-                            font-medium`}
+                  aria-controls={`status-menu-${todo.id}`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm
+                           transition-all duration-200 relative
+                           border border-slate-200 dark:border-slate-700
+                           hover:border-slate-300 dark:hover:border-slate-600
+                           ${currentStatus?.color}
+                           hover:bg-slate-50 dark:hover:bg-slate-800
+                           font-medium`}
                 >
-                  {CurrentIcon && (
-                    <CurrentIcon className="w-4 h-4" aria-hidden="true" />
-                  )}
+                  {CurrentIcon && <CurrentIcon className="w-4 h-4" aria-hidden="true" />}
                   <span>{todo.status}</span>
                 </button>
 
@@ -265,34 +253,30 @@ export const TodoItem = ({
                 )}
               </div>
 
-              <button
-                onClick={handleEditClick}
-                className="p-1.5 rounded-lg text-blue-500
-                         bg-blue-50 dark:bg-blue-500/10
-                         hover:bg-blue-100 dark:hover:bg-blue-500/20
-                         hover:text-blue-600 dark:hover:text-blue-400
-                         transition-all duration-300
-                         flex-shrink-0"
-                aria-label={`Edit task: ${todo.title}`}
-              >
-                <PencilIcon className="w-5 h-5" aria-hidden="true" />
-              </button>
+              <div className="flex gap-1">
+                <button
+                  onClick={handleEditClick}
+                  className="p-1.5 rounded-lg text-blue-500
+                           bg-blue-50 dark:bg-blue-500/10
+                           hover:bg-blue-100 dark:hover:bg-blue-500/20"
+                  aria-label={`Edit task: ${todo.title}`}
+                >
+                  <PencilIcon className="w-4 h-4" />
+                </button>
 
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="p-1.5 rounded-lg text-rose-500
-                         bg-rose-50 dark:bg-rose-500/10
-                         hover:bg-rose-100 dark:hover:bg-rose-500/20
-                         hover:text-rose-600 dark:hover:text-rose-400
-                         transition-all duration-200
-                         flex-shrink-0"
-                aria-label={`Delete task: ${todo.title}`}
-              >
-                <TrashIcon className="w-5 h-5" aria-hidden="true" />
-              </button>
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="p-1.5 rounded-lg text-rose-500
+                           bg-rose-50 dark:bg-rose-500/10
+                           hover:bg-rose-100 dark:hover:bg-rose-500/20"
+                  aria-label={`Delete task: ${todo.title}`}
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <ApprovalModal
