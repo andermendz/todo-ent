@@ -51,17 +51,20 @@ export const TodoBoard = ({
   ];
 
   const handleDragEnd = useCallback((result: DropResult) => {
-    const { destination, draggableId } = result;
+    const { destination, draggableId, source } = result;
     if (!destination) return;
     
     const newStatus = destination.droppableId as Todo['status'];
-    if (newStatus === 'Done') {
+    const draggedTodo = todos.find(t => t.id === draggableId);
+  
+    if (draggedTodo?.status === 'Done' || newStatus !== 'Done' || source.droppableId === 'Done') {
+      onStatusChange(draggableId, newStatus);
+    } else {
+      
       setPendingDragAction({ todoId: draggableId, newStatus });
       setShowApprovalModal(true);
-    } else {
-      onStatusChange(draggableId, newStatus);
     }
-  }, [onStatusChange]);
+  }, [onStatusChange, todos]);
 
   const handleApprove = () => {
     if (pendingDragAction) {
@@ -77,18 +80,19 @@ export const TodoBoard = ({
     <>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div 
-          className="grid grid-cols-3 gap-6 min-h-[600px] w-full"
+          className="grid grid-cols-3 gap-8 min-h-[600px] w-full max-w-[1400px] mx-auto"
           role="region"
           aria-label="Task board"
         >
           {columns.map(column => (
             <div 
               key={column.id}
-              className={`rounded-xl p-4 flex flex-col ${column.color}`}
+              className={`rounded-xl p-4 flex flex-col ${column.color}
+                         min-h-[600px] max-h-[75vh] overflow-hidden`}
               role="region"
               aria-label={`${column.title} column`}
             >
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-4 px-2">
                 <column.icon className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                 <h3 
                   id={`column-${column.id}`}
@@ -107,6 +111,10 @@ export const TodoBoard = ({
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className={`flex-1 space-y-3 p-2 rounded-lg transition-colors duration-200
+                              overflow-y-auto
+                              scrollbar scrollbar-w-2 scrollbar-track-transparent
+                              scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300
+                              dark:scrollbar-thumb-slate-700 dark:hover:scrollbar-thumb-slate-600
                               ${snapshot.isDraggingOver 
                                 ? 'bg-slate-100/80 dark:bg-slate-800/80' 
                                 : 'bg-transparent'

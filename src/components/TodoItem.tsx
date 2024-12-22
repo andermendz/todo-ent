@@ -1,7 +1,8 @@
 import { useState} from "react";
-import { TrashIcon, CheckCircleIcon, ClockIcon, ListBulletIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, CheckCircleIcon, ClockIcon, ListBulletIcon, PencilIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { Todo } from "../types/todo";
 import { ApprovalModal } from "./ApprovalModal";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 // props for the todo item component / props para el componente de item todo
 interface TodoItemProps {
@@ -23,6 +24,8 @@ export const TodoItem = ({
   onOptionsClick,
   isBoardMode
 }: TodoItemProps) => {
+  const isMobile = useIsMobile();
+  
   // modal and edit states / estados de modal y edición
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -137,35 +140,36 @@ export const TodoItem = ({
               <span>{editedTitle.length}/50</span>
             </div>
 
-            <div className={`flex ${isBoardMode ? 'justify-end gap-2' : 'items-center gap-2'}`}>
+            <div className="flex w-full gap-2 md:w-auto md:ml-auto">
               <button
-                type="submit"
-                disabled={!isValidTitle(editedTitle)}
-                className={`p-1.5 rounded-lg text-emerald-500
-                       bg-emerald-50 dark:bg-emerald-500/10
-                       transition-all duration-200
-                       ${!isValidTitle(editedTitle)
-                         ? 'opacity-50 cursor-not-allowed'
-                         : 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
-                       }`}
+                onClick={handleEditSubmit}
+                className="flex-1 md:w-24 p-2 rounded-lg text-emerald-500
+                         bg-emerald-50 dark:bg-emerald-500/10
+                         hover:bg-emerald-100 dark:hover:bg-emerald-500/20
+                         flex items-center justify-center"
                 aria-label="Save changes"
               >
-                <CheckCircleIcon className="w-4 h-4" />
+                <CheckIcon className="w-5 h-5" />
               </button>
+
               <button
-                type="button"
                 onClick={handleEditCancel}
-                className="p-1.5 rounded-lg text-slate-500
-                       bg-slate-50 dark:bg-slate-800
-                       hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="flex-1 md:w-24 p-2 rounded-lg text-rose-500
+                         bg-rose-50 dark:bg-rose-500/10
+                         hover:bg-rose-100 dark:hover:bg-rose-500/20
+                         flex items-center justify-center"
                 aria-label="Cancel editing"
               >
-                <XMarkIcon className="w-4 h-4" />
+                <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
           </form>
         ) : (
-          <div className={`flex ${isBoardMode ? 'flex-col gap-3' : 'flex-row gap-4'}`}>
+          <div className={`flex ${
+            isBoardMode || isMobile 
+              ? 'flex-col gap-3' 
+              : 'flex-row gap-4'
+          }`}>
             <div className="flex-grow min-w-0">
               <h3 className="text-lg text-slate-800 dark:text-slate-200 font-medium 
                            leading-tight break-words">
@@ -188,7 +192,11 @@ export const TodoItem = ({
               </time>
             </div>
 
-            <div className={`flex ${isBoardMode ? 'justify-between' : 'items-center gap-1.5'} flex-shrink-0`}>
+            <div className={`flex ${
+              isBoardMode || isMobile 
+                ? 'justify-between' 
+                : 'items-center gap-1.5'
+            } flex-shrink-0`}>
               <div className="relative">
                 <button
                   id={`status-button-${todo.id}`}
@@ -213,14 +221,16 @@ export const TodoItem = ({
                     id={statusMenuId}
                     role="menu"
                     aria-labelledby={statusButtonId}
-                    className="absolute right-0 mt-2 bg-white dark:bg-surface-dark rounded-xl
+                    className={`absolute bg-white dark:bg-surface-dark rounded-xl
                                 shadow-premium dark:shadow-premium-dark p-1.5
                                 transform origin-top-right transition-all duration-200
-                                animate-scale z-10
+                                animate-scale z-50
                                 border border-slate-200 dark:border-slate-700
                                 min-w-[120px] max-h-[calc(100vh-100px)]
-                                overflow-y-auto
-                                [&::-webkit-scrollbar]:hidden">
+                                overflow-y-auto -m-9 
+                                ${isMobile ? 'left-9' : 'right-9'}
+                                [&::-webkit-scrollbar]:hidden`}
+                  >
                     <div className="relative">
                       {statusOptions.map((option) => {
                         const Icon = option.icon;
@@ -246,25 +256,28 @@ export const TodoItem = ({
                 )}
               </div>
 
-              <div className="flex gap-1">
+              <div className="flex gap-2">
                 <button
                   onClick={handleEditClick}
-                  className="p-1.5 rounded-lg text-blue-500
+                  className="p-2 rounded-lg text-blue-500
                            bg-blue-50 dark:bg-blue-500/10
                            hover:bg-blue-100 dark:hover:bg-blue-500/20"
                   aria-label={`Edit task: ${todo.title}`}
                 >
-                  <PencilIcon className="w-4 h-4" />
+                  <PencilIcon className="w-5 h-5" />
                 </button>
 
                 <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="p-1.5 rounded-lg text-rose-500
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteModal(true);
+                  }}
+                  className="p-2 rounded-lg text-rose-500
                            bg-rose-50 dark:bg-rose-500/10
                            hover:bg-rose-100 dark:hover:bg-rose-500/20"
                   aria-label={`Delete task: ${todo.title}`}
                 >
-                  <TrashIcon className="w-4 h-4" />
+                  <TrashIcon className="w-5 h-5" />
                 </button>
               </div>
             </div>

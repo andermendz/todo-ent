@@ -12,16 +12,13 @@ import { generateTasks } from './utils/taskFactory';
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
-  const todos = useSelector((state: RootState) => state.todos.items);
-  const loading = useSelector((state: RootState) => state.todos.loading);
-  const error = useSelector((state: RootState) => state.todos.error);
-  
+  const { items: todos, loading, error } = useSelector((state: RootState) => state.todos);
+  const [status, setStatus] = useState<'all' | Todo['status']>('all');
   const { theme, toggleTheme } = useTheme();
+  const [activeOptionsId, setActiveOptionsId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'board'>(() => 
     window.innerWidth < 768 ? 'list' : 'board'
   );
-  const [status, setStatus] = useState<'all' | Todo['status']>('all');
-  const [activeOptionsId, setActiveOptionsId] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchTodos());
@@ -89,6 +86,11 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, [viewMode]);
 
+  const handleViewModeChange = (newMode: 'list' | 'board') => {
+    setViewMode(newMode);
+    setActiveOptionsId(null); // Close any open options menu
+  };
+
   if (loading) {
     return (
       <div 
@@ -125,7 +127,7 @@ function App() {
       </a>
       
       <div className="min-h-screen transition-colors duration-300 bg-background-light dark:bg-background-dark">
-        <main id="main-content" className="max-w-5xl mx-auto px-6 py-12 pb-28">
+        <main id="main-content" className="max-full max-w-[1400px] mx-auto px-6 py-12 pb-28">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-bold text-slate-800 dark:text-slate-200">
               Task Manager
@@ -134,7 +136,7 @@ function App() {
             <div className="flex items-center gap-6">
               <div className="hidden md:block">
                 <button
-                  onClick={() => setViewMode(viewMode === 'list' ? 'board' : 'list')}
+                  onClick={() => handleViewModeChange(viewMode === 'list' ? 'board' : 'list')}
                   className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
                             hover:bg-slate-200 dark:hover:bg-slate-700
                             transition-colors duration-200
