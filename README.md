@@ -1,14 +1,63 @@
-
 # Task Management Application
 
-A modern application built with React, TypeScript, and JSON Server.
+A modern task management application built with React, TypeScript, and Redux Toolkit, featuring a responsive design and intuitive user interface.
 
-## Prerequisites
+## ✨ Features
 
-- Node.js (v16 or higher)
-- npm or yarn
+### 📋 Dual View Modes
+- **List View:** Traditional task list with filtering options.
+- **Board View:** Kanban-style board with drag-and-drop functionality (Desktop only).
 
-## Installation
+### 🎯 Task Management
+- Create, edit, and delete tasks.
+- Status tracking: "To Do," "In Progress," "Done."
+- Drag-and-drop task organization (Board view).
+
+### 🔄 Status Management
+- Visual status indicators.
+- Quick status updates.
+- Status-based filtering (List view).
+
+### 🎨 Modern UI/UX
+- Clean, intuitive interface.
+- Smooth animations and transitions.
+- Responsive design for all devices.
+
+### 🌓 Theme Support
+- Light/Dark mode toggle.
+- Persistent theme preference storage.
+
+### ♿ Accessibility
+- ARIA labels and roles for enhanced usability.
+- Keyboard navigation for non-mouse users.
+- Screen reader support for visually impaired users.
+
+## 🛠 Tech Stack
+
+### **Frontend**
+- React 18
+- TypeScript
+- Redux Toolkit
+- Tailwind CSS
+- @hello-pangea/dnd (Drag and Drop)
+- Heroicons
+
+### **Form Management**
+- Formik for forms.
+- Yup for validation.
+
+### **Development**
+- Vite for fast builds and development.
+- ESLint for code quality.
+- JSON Server (Mock API) for development backend.
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v16 or higher).
+- npm or yarn.
+
+### Installation
 
 1. Clone the repository:
    ```bash
@@ -21,11 +70,9 @@ A modern application built with React, TypeScript, and JSON Server.
    npm install
    ```
 
-## Running the Application
+### Running the Application
 
-### Local Development
-
-1. Start the JSON Server (local database):
+1. Start the mock API server:
    ```bash
    npm run server
    ```
@@ -37,20 +84,6 @@ A modern application built with React, TypeScript, and JSON Server.
    ```
    The application will be available at [http://localhost:5173](http://localhost:5173).
 
-## Deployment
-
-The application is split into two parts for deployment:
-
-### Backend (JSON Server)
-- Deployed on Railway.
-- Uses the same `json-server` as local development.
-- Provides REST API endpoints for todos.
-
-### Frontend
-- Deployed on Vercel.
-- Automatically connects to the Railway backend.
-- Uses environment variables to manage API URLs.
-
 ## 📱 Responsive Design
 
 - **Desktop:** Full functionality with both List and Board views.
@@ -59,17 +92,22 @@ The application is split into two parts for deployment:
 
 ## 🔒 Data Persistence
 
-- **Development:** Data stored in local `db.json` using JSON Server.
-- **Production:** Data stored in Railway's persistent storage.
+- **Development:** Data stored in the local `db.json` file using JSON Server.
+- **Production:** Data stored in Railway's persistent storage (if configured).
 
-## API Endpoints
+## 🌐 Local vs Production
 
-The following endpoints are available in both local and production environments:
+### Local Development
+- Uses local JSON Server (`npm run server`).
+- Data stored in a local `db.json` file.
+- API accessible at [http://localhost:3001](http://localhost:3001).
+- Frontend runs on Vite's development server at [http://localhost:5173](http://localhost:5173).
 
-- `GET /todos` - Get all todos.
-- `POST /todos` - Create a new todo.
-- `PATCH /todos/:id` - Update a todo.
-- `DELETE /todos/:id` - Delete a todo.
+### Production
+- **Backend:** JSON Server hosted on Railway with persistent storage.
+- **Frontend:** Deployed on Vercel.
+- Automatically connects to the Railway backend via environment variables.
+- API accessible at the Railway URL.
 
 ## Environment Variables
 
@@ -83,33 +121,27 @@ VITE_API_URL=http://localhost:3001
 VITE_API_URL=https://your-railway-url.railway.app
 ```
 
-## Local vs Production
+## API Endpoints
 
-### Local Development
-- Uses local JSON Server (`npm run server`).
-- Data stored in local `db.json`.
-- API accessible at [http://localhost:3001](http://localhost:3001).
+The following endpoints are available in both local and production environments:
 
-### Production
-- JSON Server hosted on Railway.
-- Data persisted in Railway's storage.
-- API accessible at your Railway URL.
-- Frontend hosted on Vercel.
+- `GET /todos` - Retrieve all tasks.
+- `POST /todos` - Create a new task.
+- `PATCH /todos/:id` - Update a specific task.
+- `DELETE /todos/:id` - Delete a specific task.
 
 ## Troubleshooting
 
 ### Local Issues
 1. Ensure port `3001` is available.
-2. Check if `db.json` exists in the root directory.
-3. Try restarting the server with:
+2. Verify that the `db.json` file exists in the root directory.
+3. Restart the server with:
    ```bash
    npm run server
    ```
 
 ### Production Issues
-1. Verify Railway deployment is active.
-2. Check Vercel environment variables.
-3. Confirm CORS settings in server code.
-``` 
+1. Ensure Railway deployment is active.
+2. Verify that Vercel's environment variables are correctly set.
+3. Confirm CORS settings in the server configuration.
 
-Let me know if you need any further tweaks!
