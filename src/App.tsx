@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState, useMemo } from 'react';
-import { SunIcon, MoonIcon, ViewColumnsIcon, ListBulletIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, ViewColumnsIcon, ListBulletIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import { TodoForm } from './components/TodoForm';
 import { TodoItem } from './components/TodoItem';
 import { useTheme } from './hooks/useTheme';
@@ -8,14 +8,20 @@ import { AppDispatch, RootState } from './store/store';
 import { fetchTodos, createTodo, updateTodoStatus, removeTodo, updateTodo } from './store/slices/todoSlice';
 import { Todo } from './types/todo';
 import { TodoBoard } from './components/TodoBoard';
+import { generateTasks } from './utils/taskFactory';
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
-  const { items: todos, loading, error } = useSelector((state: RootState) => state.todos);
-  const [status, setStatus] = useState<'all' | Todo['status']>('all');
+  const todos = useSelector((state: RootState) => state.todos.items);
+  const loading = useSelector((state: RootState) => state.todos.loading);
+  const error = useSelector((state: RootState) => state.todos.error);
+  
   const { theme, toggleTheme } = useTheme();
+  const [viewMode, setViewMode] = useState<'list' | 'board'>(() => 
+    window.innerWidth < 768 ? 'list' : 'board'
+  );
+  const [status, setStatus] = useState<'all' | Todo['status']>('all');
   const [activeOptionsId, setActiveOptionsId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   useEffect(() => {
     dispatch(fetchTodos());
@@ -142,6 +148,23 @@ function App() {
                   )}
                 </button>
               </div>
+              
+              <button
+                onClick={async () => {
+                  const tasks = generateTasks();
+                  for (const task of tasks) {
+                    await dispatch(createTodo(task));
+                  }
+                }}
+                className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
+                          hover:bg-slate-200 dark:hover:bg-slate-700
+                          transition-colors duration-200
+                          focus:outline-none focus:ring-2 focus:ring-primary-light"
+                aria-label="Generate sample tasks"
+              >
+                <BeakerIcon className="w-6 h-6 text-violet-500" aria-hidden="true" />
+              </button>
+
               <button 
                 onClick={toggleTheme}
                 className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ApprovalModalProps {
   open: boolean;
@@ -19,48 +20,30 @@ export const ApprovalModal = ({
   confirmText = 'Approve',
   confirmStyle = 'primary'
 }: ApprovalModalProps) => {
-  // refs for focus management / referencias para gestión del foco
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  // handle keyboard events and focus / manejar eventos de teclado y foco
   useEffect(() => {
     if (open) {
       closeButtonRef.current?.focus();
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
     }
+  }, [open]);
 
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [open, onClose]);
-
-  // don't render if not open / no renderizar si no está abierto
   if (!open) return null;
 
-  return (
-    // modal backdrop / fondo del modal
+  const modalContent = (
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm
-                flex items-center justify-center z-50
-                animate-fade-in"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      className="fixed inset-0 z-50 flex items-center justify-center 
+                 bg-black/30 backdrop-blur-sm"
       role="dialog"
-      aria-modal="true"
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
     >
-      {/* modal content / contenido del modal */}
       <div 
         ref={modalRef}
         className="bg-white dark:bg-surface-dark rounded-2xl p-6
@@ -68,7 +51,6 @@ export const ApprovalModal = ({
                   animate-scale overflow-hidden"
         role="document"
       >
-        {/* modal title / título del modal */}
         <h2 
           id="modal-title" 
           className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-4
@@ -77,7 +59,6 @@ export const ApprovalModal = ({
           {title}
         </h2>
         
-        {/* modal message / mensaje del modal */}
         <p 
           id="modal-description" 
           className="text-slate-600 dark:text-slate-400 mb-6
@@ -86,9 +67,7 @@ export const ApprovalModal = ({
           {message}
         </p>
         
-        {/* modal actions / acciones del modal */}
         <div className="flex justify-end gap-3">
-          {/* cancel button / botón de cancelar */}
           <button
             ref={closeButtonRef}
             onClick={onClose}
@@ -102,7 +81,6 @@ export const ApprovalModal = ({
             Cancel
           </button>
           
-          {/* confirm button / botón de confirmar */}
           <button
             onClick={onApprove}
             className={`px-4 py-2 rounded-xl text-white
@@ -111,12 +89,17 @@ export const ApprovalModal = ({
                      whitespace-nowrap
                      ${confirmStyle === 'danger' 
                        ? 'bg-rose-500 hover:bg-rose-600' 
-                       : 'bg-primary-light hover:bg-primary-dark'}`}
+                       : 'bg-emerald-500 hover:bg-emerald-600'}`}
           >
             {confirmText}
           </button>
         </div>
       </div>
     </div>
+  );
+
+  return createPortal(
+    modalContent,
+    document.getElementById('modal-root') || document.body
   );
 };
