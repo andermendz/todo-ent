@@ -1,38 +1,59 @@
-# Todo Application
+# Task Management Application
 
-A modernodo application built with React, TypeScript, and Redux Toolkit.
+A modern task management application built with React, Typeript, and Redux Toolkit, featuring a responsive design and intuitive user interface.
 
-## Features
+## ✨ Features
 
-* ✨ Create, read, update, and delete todos
-* 🔄 Status management (Todo, Doing, Done) 
-* ✅ Approval workflow for completing todos
-* 🌓 Dark/Light theme support
-* 🎯 Status-based filtering
-* 📱 Responsive design
+### 📋 Dual View Modes
+* List View: Traditional task list with filtering options
+* Board View: Kanban-style board with drag-and-drop (Desktop only)
 
-## Architecture
+### 🎯 Task Management
+* Create, edit, and delete tasks
+* Status tracking: "To Do", "In Progress", "Done"
+* Drag-and-drop task organization (Board view)
 
-* React 18 with TypeScript
-* Redux Toolkit for state management
-* Component-based architecture
-* Tailwind CSS for styling
-* JSON Server for mock API
+### 🔄 Status Management
+* Visual status indicators
+* Quick status updates
+* Status-based filtering (List view)
 
-## Tech Stack
+### 🎨 Modern UI/UX
+* Clean, intuitive interface
+* Smooth animations and transitions
+* Responsive design
 
+### 🌓 Theme Support
+* Light/Dark mode toggle
+* Persistent theme preference
+
+### ♿ Accessibility
+* ARIA labels and roles
+* Keyboard navigation
+* Screen reader support
+
+## 🛠 Tech Stack
+
+### **Frontend**
 * React 18
 * TypeScript
 * Redux Toolkit
-* Formik & Yup for form management
-* Axios for API calls
 * Tailwind CSS
-* ESLint for code quality
+* @hello-pangea/dnd (Drag and Drop)
+* Heroicons
 
-## Setup & Running the Application
+### **Form Management**
+* Formik
+* Yup validation
+
+### **Development**
+* Vite
+* ESLint
+* JSON Server (Mock API)
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
 * Node.js (v16 or higher)
 * npm or yarn
 
@@ -41,7 +62,7 @@ A modernodo application built with React, TypeScript, and Redux Toolkit.
 1. Clone the repository
 \```bash
 git clone <repository-url>
-cd todo-application
+cd task-management-app
 \```
 
 2. Install dependencies
@@ -63,41 +84,12 @@ npm run dev
 \```
 The application will be available at http://localhost:5173
 
-### Available Scripts
+## 📱 Responsive Design
 
-* `npm run dev` - Start development server
-* `npm run server` - Start JSON Server (mock API)
-* `npm run build` - Build for production
-* `npm run lint` - Run ESLint
+* Desktop: Full functionality with both List and Board views
+* Mobile: Optimized List view only
+* Automatic view switching based on screen size
 
-## Features Implementation
+## 🔒 Data Persistence
 
-### State Management
-
-* Centralized state with Redux Toolkit
-* Async operations handling with createAsyncThunk
-* Loading and error states management
-
-### API Integration
-
-* Axios for API communication
-* JSON Server for mock API
-* Error handling and loading states
-
-### User Experience
-
-* Responsive design with Tailwind CSS
-* Dark/Light theme support with persistent storage
-* Form validation with Formik and Yup
-* Loading and error states
-
-## Project Structure
-
-\```
-src/
-├── components/ # Reusable UI components
-├── store/ # Redux store and slices
-├── services/ # API services
-├── hooks/ # Custom React hooks
-└── types/ # TypeScript type definitions
-\```
+* Tasks are stored in a local JSON server

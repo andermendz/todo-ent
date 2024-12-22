@@ -22,9 +22,24 @@ export const TodoBoard = ({
   onOptionsClick
 }: TodoBoardProps) => {
   const columns = [
-    { id: 'To Do', title: 'To Do', icon: ListBulletIcon, color: 'bg-blue-50 dark:bg-blue-500/5' },
-    { id: 'In Progress', title: 'In Progress', icon: ClockIcon, color: 'bg-amber-50/70 dark:bg-amber-500/10' },
-    { id: 'Done', title: 'Done', icon: CheckCircleIcon, color: 'bg-emerald-50 dark:bg-emerald-500/5' }
+    { 
+      id: 'To Do', 
+      title: 'To Do', 
+      icon: ListBulletIcon, 
+      color: 'bg-blue-100/80 dark:bg-blue-500/5' 
+    },
+    { 
+      id: 'In Progress', 
+      title: 'In Progress', 
+      icon: ClockIcon, 
+      color: 'bg-amber-100/80 dark:bg-amber-500/10' 
+    },
+    { 
+      id: 'Done', 
+      title: 'Done', 
+      icon: CheckCircleIcon, 
+      color: 'bg-emerald-100/80 dark:bg-emerald-500/5' 
+    }
   ];
 
   const handleDragEnd = useCallback((result: DropResult) => {

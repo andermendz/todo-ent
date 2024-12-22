@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { TrashIcon, CheckCircleIcon, ClockIcon, ListBulletIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Todo } from "../types/todo";
 import { ApprovalModal } from "./ApprovalModal";
@@ -98,17 +98,6 @@ export const TodoItem = ({
     setIsEditing(false);
   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setIsExpanded(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   // unique ids for accessibility / ids únicos para accesibilidad
   const statusButtonId = `status-button-${todo.id}`;
   const statusMenuId = `status-menu-${todo.id}`;
@@ -125,18 +114,30 @@ export const TodoItem = ({
       >
         {isEditing ? (
           <form onSubmit={handleEditSubmit} className="flex flex-col gap-2">
-            <div className="flex items-start gap-2">
-              <input
-                type="text"
-                value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value.slice(0, 50))}
-                className="flex-grow px-3 py-1.5 rounded-lg text-lg
-                       bg-subtle-light dark:bg-slate-800
-                       border border-slate-200 dark:border-slate-700
-                       focus:outline-none focus:ring-2 focus:ring-primary-light/20
-                       text-slate-800 dark:text-slate-200"
-                autoFocus
-              />
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value.slice(0, 50))}
+              className="w-full px-3 py-1.5 rounded-lg text-lg
+                     bg-subtle-light dark:bg-slate-800
+                     border border-slate-200 dark:border-slate-700
+                     focus:outline-none focus:ring-2 focus:ring-primary-light/20
+                     text-slate-800 dark:text-slate-200"
+              autoFocus
+            />
+            
+            <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 px-1">
+              <span>
+                {editedTitle.trim().length < 3 
+                  ? 'Title must be at least 3 characters' 
+                  : editedTitle.length > 50 
+                    ? 'Title is too long' 
+                    : ' '}
+              </span>
+              <span>{editedTitle.length}/50</span>
+            </div>
+
+            <div className={`flex ${isBoardMode ? 'justify-end gap-2' : 'items-center gap-2'}`}>
               <button
                 type="submit"
                 disabled={!isValidTitle(editedTitle)}
@@ -147,8 +148,9 @@ export const TodoItem = ({
                          ? 'opacity-50 cursor-not-allowed'
                          : 'hover:bg-emerald-100 dark:hover:bg-emerald-500/20'
                        }`}
+                aria-label="Save changes"
               >
-                <CheckCircleIcon className="w-5 h-5" />
+                <CheckCircleIcon className="w-4 h-4" />
               </button>
               <button
                 type="button"
@@ -156,19 +158,10 @@ export const TodoItem = ({
                 className="p-1.5 rounded-lg text-slate-500
                        bg-slate-50 dark:bg-slate-800
                        hover:bg-slate-100 dark:hover:bg-slate-700"
+                aria-label="Cancel editing"
               >
-                <XMarkIcon className="w-5 h-5" />
+                <XMarkIcon className="w-4 h-4" />
               </button>
-            </div>
-            <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 px-1">
-              <span>
-                {editedTitle.trim().length < 3 
-                  ? 'Title must be at least 3 characters' 
-                  : editedTitle.length > 50 
-                    ? 'Title is too long' 
-                    : ' '}
-              </span>
-              <span>{editedTitle.length}/50</span>
             </div>
           </form>
         ) : (

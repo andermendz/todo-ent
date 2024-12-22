@@ -68,7 +68,7 @@ function App() {
     }
   };
 
-  // Force list view on mobile screens
+  // force list on mobile
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768 && viewMode === 'board') {
@@ -76,7 +76,7 @@ function App() {
       }
     };
 
-    // Initial check
+    // resize check
     handleResize();
 
     window.addEventListener('resize', handleResize);
@@ -169,16 +169,16 @@ function App() {
               {statusOptions.map((option) => (
                 <button
                   key={option}
-                  onClick={() => setStatus(option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done')}
-                  onKeyDown={(e) => handleKeyPress(e, () => setStatus(option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done'))}
+                  onClick={() => setStatus(option === 'All' ? 'all' : option === 'To Do' ? 'To Do' : option === 'In Progress' ? 'In Progress' : 'Done')}
+                  onKeyDown={(e) => handleKeyPress(e, () => setStatus(option === 'All' ? 'all' : option === 'To Do' ? 'To Do' : option === 'In Progress' ? 'In Progress' : 'Done'))}
                   className={`px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200
                             focus:outline-none focus:ring-2 focus:ring-primary-light
-                            ${status === (option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done')
+                            ${status === (option === 'All' ? 'all' : option === 'To Do' ? 'To Do' : option === 'In Progress' ? 'In Progress' : 'Done')
                               ? 'bg-primary-light text-white'
                               : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                             }`}
                   role="radio"
-                  aria-checked={status === (option === 'All' ? 'all' : option === 'To Do' ? 'Todo' : option === 'In Progress' ? 'Doing' : 'Done')}
+                  aria-checked={status === (option === 'All' ? 'all' : option === 'To Do' ? 'To Do' : option === 'In Progress' ? 'In Progress' : 'Done')}
                   tabIndex={0}
                 >
                   {option}
