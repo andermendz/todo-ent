@@ -143,14 +143,14 @@ function App() {
                   {viewMode === 'list' ? (
                     <>
                       <ViewColumnsIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      <span className="hidden md:inline text-sm font-medium text-slate-700 dark:text-slate-300">
                         Board View
                       </span>
                     </>
                   ) : (
                     <>
                       <ListBulletIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      <span className="hidden md:inline text-sm font-medium text-slate-700 dark:text-slate-300">
                         List View
                       </span>
                     </>
@@ -173,7 +173,7 @@ function App() {
                   aria-label="Generate sample tasks"
                 >
                   <BeakerIcon className="w-6 h-6 text-violet-500" aria-hidden="true" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <span className="hidden md:inline text-sm font-medium text-slate-700 dark:text-slate-300">
                     Generate Tasks
                   </span>
                 </button>
@@ -189,14 +189,14 @@ function App() {
                   {theme === 'dark' ? (
                     <>
                       <SunIcon className="w-6 h-6 text-amber-500" aria-hidden="true" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      <span className="hidden md:inline text-sm font-medium text-slate-700 dark:text-slate-300">
                         Light Mode
                       </span>
                     </>
                   ) : (
                     <>
                       <MoonIcon className="w-6 h-6 text-slate-700" aria-hidden="true" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      <span className="hidden md:inline text-sm font-medium text-slate-700 dark:text-slate-300">
                         Dark Mode
                       </span>
                     </>
