@@ -117,12 +117,9 @@ function App() {
 
   return (
     <>
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 
-                  bg-primary-light text-white px-4 py-2 rounded-lg z-50
-                  focus:outline-none focus:ring-2 focus:ring-primary-light"
-      >
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 
+                bg-primary-light text-white px-4 py-2 rounded-lg z-50
+                focus:outline-none focus:ring-2 focus:ring-primary-light">
         Skip to main content
       </a>
       
@@ -133,54 +130,79 @@ function App() {
               Task Manager
             </h1>
             
-            <div className="flex items-center gap-6">
-              <div className="hidden md:block">
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2">
                 <button
                   onClick={() => handleViewModeChange(viewMode === 'list' ? 'board' : 'list')}
-                  className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
+                  className="flex items-center gap-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
                             hover:bg-slate-200 dark:hover:bg-slate-700
                             transition-colors duration-200
                             focus:outline-none focus:ring-2 focus:ring-primary-light"
                   aria-label={`Switch to ${viewMode === 'list' ? 'board' : 'list'} view`}
                 >
                   {viewMode === 'list' ? (
-                    <ViewColumnsIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                    <>
+                      <ViewColumnsIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Board View
+                      </span>
+                    </>
                   ) : (
-                    <ListBulletIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                    <>
+                      <ListBulletIcon className="w-6 h-6 text-slate-700 dark:text-slate-300" />
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        List View
+                      </span>
+                    </>
                   )}
                 </button>
               </div>
               
-              <button
-                onClick={async () => {
-                  const tasks = generateTasks();
-                  for (const task of tasks) {
-                    await dispatch(createTodo(task));
-                  }
-                }}
-                className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
-                          hover:bg-slate-200 dark:hover:bg-slate-700
-                          transition-colors duration-200
-                          focus:outline-none focus:ring-2 focus:ring-primary-light"
-                aria-label="Generate sample tasks"
-              >
-                <BeakerIcon className="w-6 h-6 text-violet-500" aria-hidden="true" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    const tasks = generateTasks();
+                    for (const task of tasks) {
+                      await dispatch(createTodo(task));
+                    }
+                  }}
+                  className="flex items-center gap-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
+                            hover:bg-slate-200 dark:hover:bg-slate-700
+                            transition-colors duration-200
+                            focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  aria-label="Generate sample tasks"
+                >
+                  <BeakerIcon className="w-6 h-6 text-violet-500" aria-hidden="true" />
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Generate Tasks
+                  </span>
+                </button>
 
-              <button 
-                onClick={toggleTheme}
-                className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
-                          hover:bg-slate-200 dark:hover:bg-slate-700
-                          transition-colors duration-200
-                          focus:outline-none focus:ring-2 focus:ring-primary-light"
-                aria-label="Toggle theme"
-              >
-                {theme === 'dark' ? (
-                  <SunIcon className="w-6 h-6 text-amber-500" aria-hidden="true" />
-                ) : (
-                  <MoonIcon className="w-6 h-6 text-slate-700" aria-hidden="true" />
-                )}
-              </button>
+                <button 
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 
+                            hover:bg-slate-200 dark:hover:bg-slate-700
+                            transition-colors duration-200
+                            focus:outline-none focus:ring-2 focus:ring-primary-light"
+                  aria-label="Toggle theme"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <SunIcon className="w-6 h-6 text-amber-500" aria-hidden="true" />
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Light Mode
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <MoonIcon className="w-6 h-6 text-slate-700" aria-hidden="true" />
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Dark Mode
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
           
