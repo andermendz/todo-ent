@@ -80,7 +80,7 @@ const generateUniqueTitle = (existingTitles: Set<string>): string => {
   return title;
 };
 
-export const generateTasks = ({ minTasks = 1, maxTasks = 3 }: TaskFactoryOptions = {}) => {
+export const generateTasks = ({ minTasks = 2, maxTasks = 4 }: TaskFactoryOptions = {}) => {
   const count = Math.floor(Math.random() * (maxTasks - minTasks + 1)) + minTasks;
   const tasks = [];
   const usedTitles = new Set<string>();
